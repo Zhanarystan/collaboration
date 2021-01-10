@@ -1,0 +1,146 @@
+﻿@model Collaboration.Models.IndexViewModel
+@{
+    ViewBag.Title = "Управление";
+}
+
+<p class="text-success">@ViewBag.StatusMessage</p>
+<div class="container mt-5">
+
+    <h4>Account editing</h4>
+    <hr />
+    <div class="row">
+        <div class="col-md-6">
+
+            @using (Html.BeginForm("EditAvatar", "Manage", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                if (ViewBag.CurrentUser.Image != null)
+                {
+                    @Html.Raw("<img style='width:300px; height:300px;' src=\"data:image/jpeg;base64,"
+                                             + Convert.ToBase64String(@ViewBag.CurrentUser.Image) + "\" />")
+                }
+                else
+                {
+                    <img src="~/pictures/nouser.png" style="width:300px;height:300px;" />
+                }
+                <input type="hidden" name="user_id" value="@ViewBag.CurrentUser.Id" />
+                <div class="form-group">
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="customFile" name="uploadImage">
+                        <label class="custom-file-label" for="customFile">Choose file</label>
+                    </div>
+                </div>
+                <div class="form-group mb-5">
+                    <button class="btn btn-primary float-right" type="submit">Upload Image</button>
+                </div>
+
+            }
+            <div class="form-group">
+                <label>Email:</label>
+                <input class="form-control" name="email" type="email" value="@ViewBag.CurrentUser.Email" readonly />
+            </div>
+            <form action="/Manage/ProfileUpdate" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+
+                <div class="form-group">
+                    <label>Name:</label>
+                    <input class="form-control" name="name" type="text" value="@ViewBag.CurrentUser.Name" />
+                </div>
+                <div class="form-group">
+                    <label>Surname:</label>
+                    <input class="form-control" name="surname" type="text" value="@ViewBag.CurrentUser.Surname" />
+                </div>
+                <div class="form-group">
+                    <label>Specification:</label>
+                    <select name="specification_id" class="form-control">
+                        <option value="@ViewBag.CurrentUser.SpecificationId" selected>@ViewBag.CurrentUser.Specification.Title</option>
+                        @foreach (Collaboration.Models.Specifications s in ViewBag.Specifications)
+                        {
+                            if (s.Id == ViewBag.CurrentUser.SpecificationId)
+                            {
+                                continue;
+                            }
+                            <option value="@s.Id">@s.Title</option>
+                        }
+                    </select>
+                </div>
+                <button class="btn btn-primary mt-3" type="submit">Update</button>
+            </form>
+        </div>
+    </div>
+    
+    <dl class="dl-horizontal">
+        <dd>
+            
+            @if (Model.HasPassword)
+            {
+                @Html.ActionLink("Change Password", "ChangePassword")
+            }
+            else
+            {
+                @Html.ActionLink("Set Password", "SetPassword")
+            }
+            
+        </dd>
+        @*
+        <dt>Внешние имена входа:</dt>
+        <dd>
+            @Model.Logins.Count [
+            @Html.ActionLink("Manage", "ManageLogins") ]
+        </dd>
+        
+            Номера телефонов можно использовать в качестве второго проверочного фактора для системы двухфакторной проверки подлинности.
+             
+             В <a href="https://go.microsoft.com/fwlink/?LinkId=403804">этой статье</a>
+                можно узнать, как для этого приложения ASP.NET настроить двухфакторную проверку подлинности с использованием SMS.
+             
+             Настроив двухфакторную проверку подлинности, раскомментируйте следующий блок
+        
+         
+            <dt>Номер телефона:</dt>
+            <dd>
+                @(Model.PhoneNumber ?? "None")
+                @if (Model.PhoneNumber != null)
+                {
+                    <br />
+                    <text>[&nbsp;&nbsp;@Html.ActionLink("Change", "AddPhoneNumber")&nbsp;&nbsp;]</text>
+                    using (Html.BeginForm("RemovePhoneNumber", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <text>[<input type="submit" value="Удалить" class="btn-link" />]</text>
+                    }
+                }
+                else
+                {
+                    <text>[&nbsp;&nbsp;@Html.ActionLink("Add", "AddPhoneNumber")</text>
+                }
+            </dd>
+        
+        <dt>Двухфакторная проверка подлинности:</dt>
+        <dd>
+            <p>
+                Поставщики двухфакторной проверки подлинности не настроены. В <a href="https://go.microsoft.com/fwlink/?LinkId=403804">этой статье</a>
+                можно узнать, как настроить двухфакторную проверку подлинности для этого приложения ASP.NET.
+            </p>
+            @if (Model.TwoFactor)
+                {
+                    using (Html.BeginForm("DisableTwoFactorAuthentication", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <text>Включено
+                        <input type="submit" value="Отключить" class="btn btn-link" />
+                        </text>
+                    }
+                }
+                else
+                {
+                    using (Html.BeginForm("EnableTwoFactorAuthentication", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <text>Отключено
+                        <input type="submit" value="Включить" class="btn btn-link" />
+                        </text>
+                    }
+                }
+        </dd>*@
+    </dl>
+</div>

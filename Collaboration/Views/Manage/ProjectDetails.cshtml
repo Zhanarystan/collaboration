@@ -1,0 +1,206 @@
+﻿@model Collaboration.Models.Projects
+@using Microsoft.AspNet.Identity
+@using Collaboration.Helpers
+@{
+    ViewBag.Title = "ProjectDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="container mt-5">
+    <div class="row">
+        <h2>@Html.DisplayFor(model => model.Title)</h2>
+        @if (Model.PostedBy.Id.Equals(ViewBag.CurrentUser.Id))
+        {
+            <a type="button" style="text-decoration:none; margin-left:40px;" data-toggle="modal" href="#changeTitle">
+                Change Title
+            </a>
+
+            <p style="margin-left: 20px; color:red;">@Html.ValidationMessageFor(model => model.Title)</p>
+        }
+
+        <div class="modal fade" id="changeTitle" tabindex="-1" aria-labelledby="changeTitleLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Project title</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form action="/Manage/ProjectDetails" method="post">
+                        <div class="modal-body">
+
+                            <input type="hidden" name="project_id" value="@Model.Id" />
+                            <input type="text" class="form-control" name="project_title" value="@Model.Title" />
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary" name="cTitle">Save changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr />
+    <div class="row">
+        <div class="col-md-7">
+            <dt>
+                @Html.DisplayNameFor(model => model.Description)
+            </dt>
+
+            <p style="width:100%;">
+                @Html.DisplayFor(model => model.Description)
+            </p>
+            <dt>
+                Posted By:
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.PostedBy.Name) @Html.DisplayFor(model => model.PostedBy.Surname)
+            </dd>
+            <br />
+            <h4>Supported in:</h4>
+            @if (ViewBag.CurrentUser.Id == Model.PostedById)
+            {
+
+                <form action="/Manage/AssignCountry" method="post">
+                    <input type="hidden" name="project_id" value="@Model.Id" />
+                    <select name="country_id" class="form-control">
+                        @foreach(Collaboration.Models.Countries c in ViewBag.Countries)
+                        {
+                            <option value="@c.Id">@c.Name / @c.Code</option>
+                        }
+                    </select>
+                    <button class="btn btn-primary mt-3" name="assign_country" type="submit">Assign</button>
+                </form>
+                <br />
+                if (Model.Countries != null)
+                {
+                    foreach (Collaboration.Models.Countries c in Model.Countries)
+                    {
+                        <form action="/Manage/UnsignCountry" method="post">
+                            <input type="hidden" name="project_id" value="@Model.Id" />
+                            <input type="hidden" name="country_id" value="@c.Id" />
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <p>@c.Name / @c.Code</p>
+                                </div>
+                                <div class="col-md-2">
+                                    <button class="btn btn-danger btn-sm" type="submit">-</button>
+                                </div>
+                            </div>
+
+                        </form>
+                    }
+                }
+
+            }
+            else
+            {
+                if (Model.Countries != null)
+                {
+
+                    @Html.List(Model.Countries)
+                    
+                }
+            }
+        </div>
+        <div class="col-md-4 offset-1">
+            <h4>Participated Users</h4>
+            <div class="card" style="width: 120%;">
+                <div class="card-header">
+                    @ViewBag.CurrentUser.Name @ViewBag.CurrentUser.Surname (@ViewBag.CurrentUser.Email)
+                </div>
+                <ul class="list-group list-group-flush">
+                    @if (ViewBag.CurrentUser.Id != Model.PostedById)
+                    {
+                        <a href="/Home/UserDetails?user_id=@Model.PostedById" style="text-decoration:none;">
+                            <li class="list-group-item">
+                                @Model.PostedBy.Name @Model.PostedBy.Surname (@Model.PostedBy.Email)
+                            </li>
+                        </a>
+                    }
+                    @if (Model.Enrollments != null)
+                    {
+                        foreach (Collaboration.Models.Enrollments en in Model.Enrollments)
+                        {
+                            if (en.UserId == ViewBag.CurrentUser.Id)
+                            {
+                                continue;
+                            }
+                            
+
+                                <li class="list-group-item">
+                                    <div class="row">
+                                         
+                                        <div class="col-md-9">
+                                            <a href="/Home/UserDetails?user_id=@en.UserId" style="text-decoration:none;">
+                                                @en.User.Name @en.User.Surname (@en.User.Email)
+                                                </a>
+                                        </div>
+                            <div class="col-md-3">
+                                <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#exampleModal_@en.Id">
+                                    -
+                                </button>
+                                <div class="modal fade" id="exampleModal_@en.Id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLabel">Message</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Do you really want to remove @en.User.Name @en.User.Surname?
+
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                                                <form action="/Manage/RemoveMember" method="post">
+                                                    <input type="hidden" name="enrollment_id" value="@en.Id" />
+                                                    <input type="hidden" name="project_id" value="@Model.Id" />
+                                                    <button type="submit" class="btn btn-danger">Yes</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+</div>
+                               </li>
+                            
+                        }
+                    }
+                </ul>
+            </div>
+            
+        </div>
+
+    </div>
+
+   <div class="row mt-5">
+       <div class="col-md-8">
+           @if (ViewBag.CurrentUser.Id == Model.PostedById)
+           {
+           <form action="/Manage/RemoveProject" method="post">
+               <input type="hidden" name="project_id" value="@Model.Id" />
+               <button class="btn btn-primary" type="submit">Close Issue</button>
+           </form>
+           }
+           else
+           {
+       <form action="/Manage/QuitProject" method="post">
+           <input type="hidden" name="user_id" value="@User.Identity.GetUserId()" />
+           <input type="hidden" name="project_id" value="@Model.Id" />
+           <button class="btn btn-danger" type="submit">Quit Project</button>
+       </form>
+           }
+       </div>
+   </div>
+</div>
+

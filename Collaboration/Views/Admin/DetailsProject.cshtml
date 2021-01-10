@@ -1,0 +1,47 @@
+﻿@model Collaboration.Models.Projects
+
+@{
+    ViewBag.Title = "DetailsProject";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>DetailsProject</h2>
+
+<div>
+    <h4>Projects</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        
+
+       
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Title)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Title)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.PostedDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.PostedDate)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Delete", "DeleteProject", new { id = Model.Id }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

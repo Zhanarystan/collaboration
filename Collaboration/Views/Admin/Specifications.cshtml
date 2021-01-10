@@ -1,0 +1,39 @@
+﻿@model IEnumerable<Collaboration.Models.Specifications>
+
+@{
+    ViewBag.Title = "Specifications";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Specifications</h2>
+
+<p>
+    @Html.ActionLink("Create New", "CreateSpecification")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Title)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Description)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Title)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Description)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "EditSpecification", new { id=item.Id }) |
+            @Html.ActionLink("Delete", "DeleteSpecification", new { id=item.Id })
+        </td>
+    </tr>
+}
+
+</table>

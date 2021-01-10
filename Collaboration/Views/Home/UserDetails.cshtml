@@ -1,0 +1,60 @@
+﻿@model Collaboration.Models.ApplicationUser
+
+@{
+    ViewBag.Title = "UserDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="container mt-5">
+    <h4>@Model.Name @Model.Surname Profile</h4>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-4">
+            @if (Model.Image != null)
+            {
+                @Html.Raw("<img style='width:300px; height:300px;' src=\"data:image/jpeg;base64,"
+                                    + Convert.ToBase64String(Model.Image) + "\" />")
+            }
+            else
+            {
+                <img src="~/pictures/nouser.png" style="width:300px;height:300px;" />
+            }
+            <dt>
+                Full name:
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Name) @Html.DisplayFor(model => model.Surname)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.Email)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Email)
+            </dd>
+        </div>
+        <div class="col-md-7 offset-1">
+            <h4>Works</h4>
+            @if (Model.Works != null)
+            {
+                foreach (Collaboration.Models.Works work in Model.Works)
+                {
+                    <a style="border:solid; border-width:1px;" class="btn btn-link btn-block text-left" data-toggle="collapse" href="#collapseExample_@work.Id" role="button" aria-expanded="false" aria-controls="collapseOne">
+                        @work.Title
+                    </a>
+                    <div class="collapse" id="collapseExample_@work.Id">
+                        <div class="card card-body">
+                            @work.description
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <p>No works</p>
+            }
+        </div>
+    </div>
+</div>
+

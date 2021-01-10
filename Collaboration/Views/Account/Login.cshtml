@@ -1,0 +1,73 @@
+﻿@using Collaboration.Models
+@model LoginViewModel
+@{
+    ViewBag.Title = "Выполнить вход";
+}
+
+
+<div class="row" style="margin-top:100px;">
+    <div class="card text-center" style="width:60%; margin-left:auto; margin-right:auto;">
+        <div class="card-header">
+            <ul class="nav nav-tabs card-header-tabs justify-content-center">
+                <li class="nav-item" style="width:50%;">
+                    <a class="nav-link active" href="#">Login</a>
+                </li>
+                <li class="nav-item" style="width:50%;">
+                    <a class="nav-link" href="/Account/Register">Registration</a>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <section id="loginForm" style="width:80%; margin-left:auto; margin-right:auto;">
+                @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <h4>Use local account to sign in</h4>
+                    <hr />
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                    <div class="form-group" style="width: 80%; margin-right: auto; margin-left: auto;">
+                        @Html.LabelFor(m => m.Email, new { @class = "col-md-3 control-label" })
+                        <br />
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group"  style="width: 80%; margin-right: auto; margin-left: auto;  margin-top: 10px;">
+                        @Html.LabelFor(m => m.Password, new { @class = "col-md-3 control-label" })
+                        @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })        
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <div class="checkbox">
+                                @Html.CheckBoxFor(m => m.RememberMe)
+                                @Html.LabelFor(m => m.RememberMe)
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top:20px;margin-bottom:20px;">
+                            <button type="submit" value="Login" class="btn btn-primary">Login</button>
+                        
+                    </div>
+                    <p>
+                        @Html.ActionLink("Sign Up new user", "Register")
+                    </p>
+                    @* Включите, когда будет включено подтверждение учетной записи для функции сброса пароля
+            <p>
+                @Html.ActionLink("Забыли пароль?", "ForgotPassword")
+            </p>*@
+                }
+            </section>
+        </div>
+    </div>
+</div>
+@*
+<div class="row">
+    <section id="socialLoginForm">
+        @Html.Partial("_ExternalLoginsListPartial", new ExternalLoginListViewModel { ReturnUrl = ViewBag.ReturnUrl })
+    </section>
+</div>
+    *@
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

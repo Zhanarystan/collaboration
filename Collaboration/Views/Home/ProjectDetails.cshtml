@@ -1,0 +1,83 @@
+﻿@model Collaboration.Models.EnrollmentRequests
+@using Microsoft.AspNet.Identity
+@{
+    ViewBag.Title = "ProjectDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <p>Request</p>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            @using (Html.BeginForm())
+            {
+                <div class="modal-body">
+
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(model => model.UserId, new { Value = User.Identity.GetUserId()  })
+                    @Html.HiddenFor(model => model.ProjectId, new { Value = @ViewBag.Project.Id })
+
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.RequestMessage, htmlAttributes: new { @class = "control-label col-md-6" })
+                        @Html.TextAreaFor(model => model.RequestMessage, new { @class = "form-control", rows = "", cols = "", style = "width: 90%; height: 50px;" })
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Request</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-8">
+        <h2>@ViewBag.Project.Title</h2>
+        <p>@ViewBag.Project.Description</p>
+        <hr />
+        <p>Posted by @ViewBag.Project.PostedBy.Name @ViewBag.Project.PostedBy.Surname (@ViewBag.Project.PostedDate)</p>
+        @if (ViewBag.Project.Countries != null)
+        {
+            <h6>Project supported in:</h6>
+            foreach(Collaboration.Models.Countries c in ViewBag.Project.Countries)
+            {
+                <p>@c.Name</p>
+            }
+        }
+        <br />
+        @if (User.Identity.IsAuthenticated)
+        {
+            if (ViewBag.EnrollmentRequest == null && ViewBag.Enrollment == null)
+            {
+        <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#exampleModal">
+            Request to join
+        </button>
+        }
+        if(ViewBag.EnrollmentRequest != null)
+        {
+            <form action="/Home/RequestProcessing" method="post">
+                <input type="hidden" name="user_id" value="@User.Identity.GetUserId()" />
+                <input type="hidden" name="project_id" value="@ViewBag.Project.Id" />
+                <button type="submit" name="reject" class="btn btn-danger">CANCEL REQUEST</button>
+            </form>
+            }
+            if(ViewBag.Enrollment!=null)
+            {
+            <form action="/Manage/RemoveMember" method="post">
+                <input type="hidden" name="enrollment_id" value="@ViewBag.Enrollment.Id" />
+                <input type="hidden" name="project_id" value="@ViewBag.Project.Id" />
+                <button type="submit" name="reject" class="btn btn-danger">Quit Project</button>
+            </form>
+            }
+        }
+        <p style="color:red;">@Html.ValidationMessageFor(model => model.RequestMessage, "", new { @class = "text-danger" })</p>
+    </div>
+</div>
+
+<div>
+    @Html.ActionLink("Back to List", "Projects")
+</div>

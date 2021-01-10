@@ -1,0 +1,51 @@
+﻿@model IEnumerable<Collaboration.Models.Projects>
+
+@{
+    ViewBag.Title = "Projects";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Projects</h2>
+
+
+<table class="table">
+    <tr>
+        <th>
+            Posted By
+        </th>
+        <th>
+            Specification
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Title)
+        </th>
+       
+        <th>
+            @Html.DisplayNameFor(model => model.PostedDate)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @item.PostedBy.Name @item.PostedBy.Surname
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Specification.Title)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Title)
+        </td>
+        
+        <td>
+            @Html.DisplayFor(modelItem => item.PostedDate)
+        </td>
+        <td>
+            @Html.ActionLink("Details", "DetailsProject", new { id = item.Id }) |
+            @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+        </td>
+    </tr>
+}
+
+</table>

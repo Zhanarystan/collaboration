@@ -1,0 +1,330 @@
+﻿@model Collaboration.Models.Projects
+@{
+    ViewBag.Title = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                
+            </div>
+            <form action="/Manage/Dashboard" method="post">
+                <div class="modal-body">
+                    <input type="hidden" name="user_id" value="@ViewBag.User.Id" />
+                    <div class="form-group">
+                        <div class="editor-label">
+                            @Html.LabelFor(model => model.Title)
+                        </div>
+                        <div class="editor-field">
+                            <input class="form-control" name="project_title" type="text" value="" />
+
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="editor-label">
+                            @Html.LabelFor(model => model.Description)
+                        </div>
+                        <div class="editor-field">
+                            <textarea class="form-control" name="project_description"></textarea>
+
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Specification:</label>
+                        <select class="form-control" name="specification_id">
+                            @foreach (var sp in ViewBag.Specifications)
+                            {
+                                <option value="@sp.Id">@sp.Title</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">CREATE NEW</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="row mt-5">
+    <div class="col-md-5">
+        @if (ViewBag.User.Image != null)
+        {
+            @Html.Raw("<img style='width:300px; height:300px;' src=\"data:image/jpeg;base64,"
+                                + Convert.ToBase64String(ViewBag.User.Image) + "\" />")
+        }
+        else
+        {
+            <img src="~/pictures/nouser.png" style="width:300px;height:300px;" />
+        }
+
+            <div class="card mb-3" style="max-width: 540px;">
+                <div class="row no-gutters">
+
+                    <div class="col-md-12">
+                        <div class="card-body">
+                            <h5 class="card-title">@ViewBag.User.Name @ViewBag.User.Surname</h5>
+                            <p class="card-text">@ViewBag.User.Email</p>
+                            @if (ViewBag.User.Specification != null)
+                            {
+                                <p class="card-text">@ViewBag.User.Specification.Title</p>
+                            }
+                            else
+                            {
+                                <p>Please, choose your specification:</p>
+                                <form method="post" action="/Manage/Dashboard">
+                                    <select name="specification_id_s" class="form-control">
+                                        @foreach (var s in ViewBag.Specifications)
+                                        {
+                                            <option value="@s.Id">@s.Title</option>
+                                        }
+                                    </select>
+                                    <br />
+                                    <button type="submit" name="add_specification" class="btn btn-primary btn-sm">Assign</button>
+                                </form>
+                            }
+                        </div>
+                        <div class="card-footer">
+                            <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#exampleModal">
+                                POST NEW PROJECT
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <div class="editor-field">
+            <h4 style="color:red;">@Html.ValidationMessageFor(model => model.Title)</h4>
+        </div>
+        <div class="editor-field">
+            <h4 style="color:red;">@Html.ValidationMessageFor(model => model.Description)</h4>
+        </div>
+        <div class="row mt-2 ml-1">
+            <a class="btn btn-primary" href="/Manage">EDIT PROFILE</a>
+        </div>
+        <div class="row mt-2 ml-1">
+            <a class="btn btn-primary" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+                <p>
+                    Requests to enrollment @if (ViewBag.Count > 0)
+                    {<b>(@ViewBag.Count)</b>}
+                </p>
+            </a>
+        </div>
+
+        <div class="container mt-5">
+            <div class="collapse" id="collapseExample">
+                <div class="card card-body" style="overflow-y:auto; height:400px;">
+                    @if (@ViewBag.Count > 0)
+                    {
+                        foreach (Collaboration.Models.EnrollmentRequests e in ViewBag.Requests)
+                        {
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <a href="/Home/UserDetails?user_id=@e.User.Id"><h5 class="card-title">@e.User.Name @e.User.Surname</h5></a>
+                                    <p class="card-text">Requested to: <b>@e.Project.Title</b></p>
+                                    <p class="card-text">Message: @e.RequestMessage</p>
+                                    <div class="row float-right">
+                                        <form action="/Home/RequestProcessing" method="post">
+                                            <input type="hidden" name="user_id" value="@e.UserId" />
+                                            <input type="hidden" name="project_id" value="@e.ProjectId" />
+                                            <button type="submit" name="accept" class="btn btn-success">Accept</button>
+                                            <button type="submit" name="reject" class="btn btn-danger">Reject</button>
+                                        </form>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                        }
+                    }
+                    @if (ViewBag.Count == 0)
+                    {
+                        <p>No requests</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+
+        <div id="tabs">
+            <!-- Кнопки -->
+            <ul class="tabs-nav">
+                <li><a href="#tab-1">My Projects</a></li>
+                <li><a href="#tab-2">Enrollments</a></li>
+                <li><a href="#tab-3">Enrollment Requests</a></li>
+            </ul>
+
+            <!-- Контент -->
+            <div class="tabs-items">
+                <div class="tabs-item" id="tab-1" style="overflow-y:auto; height:400px;">
+
+                    @foreach (Collaboration.Models.Projects p in ViewBag.User.Projects)
+                    {
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">@p.Title</h5>
+                                <p class="card-text">Author:@p.PostedBy.Name @p.PostedBy.Surname</p>
+                                <a href="/Manage/ProjectDetails?project_id=@p.Id" class="btn btn-primary">DETAILS</a>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="tabs-item" id="tab-2" style="overflow-y:auto; height:400px;">
+                    @if (ViewBag.User.Enrollments != null)
+                    {
+                        foreach (Collaboration.Models.Enrollments p in ViewBag.User.Enrollments)
+                        {
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">@p.Project.Title</h5>
+                                    <p class="card-text">Author:@p.Project.PostedBy.Name @p.Project.PostedBy.Surname</p>
+                                    <a href="/Manage/ProjectDetails?project_id=@p.ProjectId" class="btn btn-primary">DETAILS</a>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+                <div class="tabs-item" id="tab-3" style="overflow-y:auto; height:400px;">
+                    @if (ViewBag.User.EnrollmentRequests != null)
+                    {
+                        foreach (Collaboration.Models.EnrollmentRequests p in ViewBag.User.EnrollmentRequests)
+                        {
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">@p.Project.Title</h5>
+                                    <p class="card-text">Author:@p.Project.PostedBy.Name @p.Project.PostedBy.Surname</p>
+                                    <a href="/Home/ProjectDetails?project_id=@p.Project.Id" class="btn btn-primary">DETAILS</a>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#exampleModal_work">Add work</button>
+                <h4>Works</h4>
+                @if (ViewBag.User.Works != null)
+                {
+                    foreach (Collaboration.Models.Works work in ViewBag.User.Works)
+                    {
+                        <a style="border:solid; border-width:1px;" class="btn btn-link btn-block text-left" data-toggle="collapse" href="#collapseExample_@work.Id" role="button" aria-expanded="false" aria-controls="collapseOne">
+                            @work.Title
+                        </a>
+                        <div class="collapse" id="collapseExample_@work.Id">
+                            <div class="card card-body">
+                                @work.description
+                                <br />
+                                <br />
+                                <form action="/Manage/DeleteWork" method="post">
+                                    <input type="hidden" name="work_id" value="@work.Id" />
+                                    <button type="submit" class="btn btn-danger btn-sm" style="width:20%;">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p>No works</p>
+                }
+            </div>
+        </div>
+        
+        <div class="modal fade" id="exampleModal_work" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Work</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form action="/Manage/AddWork" method="post">
+                        <input type="hidden" name="user_id" value="@ViewBag.User.Id" />
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Title</label>
+                                <input type="text" name="work_title" class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label>Description</label>
+                                <textarea name="work_description" class="form-control"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Add</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <style>
+            #tabs {
+                margin: 10px 0;
+            }
+
+            .tabs-nav {
+                overflow: hidden;
+                margin: 0;
+                padding: 0;
+            }
+
+                .tabs-nav li {
+                    display: block;
+                    float: left;
+                    padding: 0;
+                    list-style: none;
+                }
+
+                .tabs-nav a {
+                    display: block;
+                    padding: 10px 20px;
+                    border-top: 1px solid #ccc;
+                    border-bottom: 1px solid #ccc;
+                    border-left: 1px solid #ccc;
+                    background: #fbfbfb;
+                    font-size: 16px;
+                    text-decoration: none;
+                    text-align: center;
+                    color: #999;
+                }
+
+                .tabs-nav li:first-child a {
+                    border-radius: 5px 0 0 0;
+                }
+
+                .tabs-nav li:last-child a {
+                    display: block;
+                    border-right: 1px solid #ccc;
+                    border-radius: 0 5px 0 0;
+                }
+
+                .tabs-nav a.active {
+                    border-bottom: 1px solid #fff;
+                    background: #fff;
+                    color: #000;
+                }
+
+            .tabs-items {
+                border: 1px solid #ccc;
+                border-radius: 0 5px 5px 5px;
+                background: #fff;
+                margin: -1px 0 0 0;
+            }
+
+            .tabs-item {
+                padding: 15px;
+            }
+        </style>
+
+
+    </div>
+</div>
+
